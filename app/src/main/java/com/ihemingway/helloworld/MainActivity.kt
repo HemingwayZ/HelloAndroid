@@ -1,8 +1,11 @@
 package com.ihemingway.helloworld
 
+import android.content.Intent
 import android.graphics.Color
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
+import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
@@ -13,11 +16,16 @@ class MainActivity : AppCompatActivity() {
 
         // Example of a call to a native method
         tvHello.text = stringFromJNI()
-        tvHello.text = "aa"
-        var a = "111"
-        var b = "bbb"
+        tvHello.setOnClickListener {
+            startActivity()
+        }
     }
 
+    fun startActivity(){
+        var intent = Intent()
+        intent.setClass(this,ScreenLockActivity::class.java)
+        startActivity(intent)
+    }
     /**
      * A native method that is implemented by the 'native-lib' native library,
      * which is packaged with this application.
