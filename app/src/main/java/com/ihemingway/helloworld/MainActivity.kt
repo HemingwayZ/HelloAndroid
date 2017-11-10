@@ -1,5 +1,6 @@
 package com.ihemingway.helloworld
 
+import android.graphics.Color
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import kotlinx.android.synthetic.main.activity_main.*
@@ -11,7 +12,10 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         // Example of a call to a native method
-        sample_text.text = stringFromJNI()
+        tvHello.text = stringFromJNI()
+        tvHello.text = "aa"
+        var a = "111"
+        var b = "bbb"
     }
 
     /**
