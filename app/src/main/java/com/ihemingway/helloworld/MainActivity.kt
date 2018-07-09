@@ -22,9 +22,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun startActivity(){
-        var intent = Intent()
-        intent.setClass(this,ScreenLockActivity::class.java)
-        startActivity(intent)
+
     }
     /**
      * A native method that is implemented by the 'native-lib' native library,
