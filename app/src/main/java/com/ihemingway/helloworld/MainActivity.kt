@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
+import com.hemingway.libhellosponge.MainActivity
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
@@ -17,12 +18,13 @@ class MainActivity : AppCompatActivity() {
         // Example of a call to a native method
         tvHello.text = stringFromJNI()
         tvHello.setOnClickListener {
-            startActivity()
+            startActivity1()
         }
     }
 
-    fun startActivity(){
-
+    fun startActivity1(){
+        var intent = Intent(this,MainActivity::class.java)
+        startActivity(intent)
     }
     /**
      * A native method that is implemented by the 'native-lib' native library,
