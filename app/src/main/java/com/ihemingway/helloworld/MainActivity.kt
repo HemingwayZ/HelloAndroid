@@ -1,12 +1,9 @@
 package com.ihemingway.helloworld
 
 import android.content.Intent
-import android.graphics.Color
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
-import android.widget.Toast
-import com.hemingway.libhellosponge.MainActivity
+import com.ihemingway.helloworld.test.ShortCutActivity
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
@@ -23,8 +20,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun startActivity1(){
-        var intent = Intent(this,MainActivity::class.java)
-        startActivity(intent)
+        var intent = Intent(Intent.ACTION_CREATE_SHORTCUT)
+        intent.setClass(this,ShortCutActivity::class.java)
+//        intent.setAction()
+        startActivityForResult(intent,100)
     }
     /**
      * A native method that is implemented by the 'native-lib' native library,
