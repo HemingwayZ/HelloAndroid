@@ -4,6 +4,7 @@ import android.annotation.TargetApi;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ProviderInfo;
 import android.content.pm.ResolveInfo;
@@ -13,7 +14,10 @@ import android.database.Cursor;
 import android.graphics.drawable.Icon;
 import android.net.Uri;
 import android.os.Build;
+import android.text.TextUtils;
 import android.util.Log;
+
+import com.ihemingway.helloworld.R;
 
 import java.util.List;
 import java.util.regex.Pattern;
@@ -25,9 +29,9 @@ import java.util.regex.Pattern;
  * Author: hemingway
  */
 public class ShortCutUtils {
-    public static final String ACTION_ADD_SHORTCUT = "com.android.launcher.action.INSTALL_SHORTCUT";
+    private static final String ACTION_ADD_SHORTCUT = "com.android.launcher.action.INSTALL_SHORTCUT";
     //移除快捷方式
-    public static final String ACTION_REMOVE_SHORTCUT = "com.android.launcher.action.UNINSTALL_SHORTCUT";
+    private static final String ACTION_REMOVE_SHORTCUT = "com.android.launcher.action.UNINSTALL_SHORTCUT";
     private static final String TAG = ShortCutUtils.class.getSimpleName();
 
     /**
@@ -43,8 +47,8 @@ public class ShortCutUtils {
      */
     public static void addShortCut(Context context,String scName,int scIconId,Class launchActivity){
 
-//        if(hasShortcut(context,context.getPackageName())){
-//            removeShortcut(context,scName,launchActivity);
+//        if(hasShortcut(context,scName)){
+////            removeShortcut(context,scName,launchActivity);
 //            Log.d(TAG,"hasShortcut");
 //        }else{
 //            Log.d(TAG,"addShortCut");
@@ -73,7 +77,7 @@ public class ShortCutUtils {
         // 但是名称不同时，虽然有的手机系统会显示Toast提示重复，仍然会建立快链
         // 屏幕上没有空间时会提示
         // 注意：重复创建的行为MIUI和三星手机上不太一样，小米上似乎不能重复创建快捷方式
-        addShortcutIntent.putExtra("duplicate", true);
+        addShortcutIntent.putExtra("duplicate", false);
         addShortcutIntent.putExtra(Intent.EXTRA_SHORTCUT_NAME, scName);
         //图标
         addShortcutIntent.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE, Intent.ShortcutIconResource.fromContext(context, scIconId));
@@ -121,7 +125,6 @@ public class ShortCutUtils {
         if (resolveInfo == null) {
             return null;
         }
-//        List<ProviderInfo> info = mPackageManager.queryContentProviders(resolveInfo.activityInfo.packageName, resolveInfo.activityInfo.applicationInfo.uid, PackageManager.GET_PROVIDERS);
         List<ProviderInfo> info = mPackageManager.queryContentProviders(resolveInfo.activityInfo.packageName, resolveInfo.activityInfo.applicationInfo.uid, PackageManager.GET_PROVIDERS);
         if (info != null) {
             for (int j = 0; j < info.size(); j++) {
@@ -138,25 +141,33 @@ public class ShortCutUtils {
         }
         return null;
     }
+
+    /**
+     * oppo 无效 小米有效
+     * @param context
+     * @param appName
+     * @return
+     */
     private static boolean hasShortcut(Context context, String appName) {
-        long start = System.currentTimeMillis();
+        Log.d(TAG,appName);
         String authority = getAuthorityFromPermission(context);
         if (authority == null) {
             return false;
         }
-        long end = System.currentTimeMillis() - start;
         String url = "content://" + authority + "/favorites?notify=true";
+        Log.d(TAG,"url_"+url);
         try {
             Uri CONTENT_URI = Uri.parse(url);
-            Cursor c = context.getContentResolver().query(CONTENT_URI, null, " title= ? ", new String[]{appName}, null);
+            Cursor c = context.getContentResolver().query(CONTENT_URI, new String[] { "title" }, "title=?", new String[] { appName },null);
             if (c != null && c.moveToNext()) {
                 c.close();
+                Log.d(TAG,"TRUE");
                 return true;
             }
         } catch (Exception e) {
             return false;
         }
-
+        Log.d(TAG,"FALSE");
         return false;
     }
 
