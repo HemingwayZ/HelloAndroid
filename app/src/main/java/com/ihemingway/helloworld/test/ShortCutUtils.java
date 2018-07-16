@@ -19,11 +19,10 @@ public class ShortCutUtils {
     public static final String ACTION_ADD_SHORTCUT = "com.android.launcher.action.INSTALL_SHORTCUT";
 
     public static void addShortCut(Context context,String scName,int scIconId,Class launchActivity){
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            addShortCutAboveO(context,scName,scIconId,launchActivity);
-        }else{
-            addShortCutBelowO(context,scName,scIconId,launchActivity);
-        }
+        Intent launcherIntent = new Intent();
+        launcherIntent.setClass(context, launchActivity);
+        launcherIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        addShortCut(context,scName,scIconId,launcherIntent);
     }
     public static void addShortCut(Context context,String scName,int scIconId,Intent launchIntent){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -46,12 +45,6 @@ public class ShortCutUtils {
         // 发送广播
         context.sendBroadcast(addShortcutIntent);
     }
-    private static void addShortCutBelowO(Context context,String scName,int scIconId,Class launchActivity){
-        Intent launcherIntent = new Intent();
-        launcherIntent.setClass(context, launchActivity);
-        launcherIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        addShortCutBelowO(context,scName,scIconId,launcherIntent);
-    }
 
     @TargetApi(Build.VERSION_CODES.O)
     private static void addShortCutAboveO(Context context, String scName, int scIconId, Intent launchIntent){
@@ -69,13 +62,4 @@ public class ShortCutUtils {
             shortcutManager.requestPinShortcut(info, shortcutCallbackIntent.getIntentSender());
         }
     }
-
-    @TargetApi(Build.VERSION_CODES.O)
-    private static void addShortCutAboveO(Context context,String scName,int scIconId,Class launchActivity) {
-        Intent launcherIntent = new Intent();
-        launcherIntent.setClass(context, launchActivity);
-        launcherIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        addShortCutAboveO(context,scName,scIconId,launcherIntent);
-    }
-
 }
