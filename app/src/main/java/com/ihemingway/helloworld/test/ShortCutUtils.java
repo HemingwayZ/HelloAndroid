@@ -4,7 +4,7 @@ import android.annotation.TargetApi;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageInfo;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.pm.ProviderInfo;
 import android.content.pm.ResolveInfo;
@@ -14,10 +14,7 @@ import android.database.Cursor;
 import android.graphics.drawable.Icon;
 import android.net.Uri;
 import android.os.Build;
-import android.text.TextUtils;
 import android.util.Log;
-
-import com.ihemingway.helloworld.R;
 
 import java.util.List;
 import java.util.regex.Pattern;
@@ -25,6 +22,10 @@ import java.util.regex.Pattern;
 /**
  * Description:android  快捷键创建工具
  * Data：2018/7/16-13:46
+ * 启动的activity需要加入行为
+ * <intent-filter>
+ * <action android:name="android.intent.action.CREATE_SHORTCUT"/>
+ * </intent-filter>
  * <p>
  * Author: hemingway
  */
@@ -33,42 +34,85 @@ public class ShortCutUtils {
     //移除快捷方式
     private static final String ACTION_REMOVE_SHORTCUT = "com.android.launcher.action.UNINSTALL_SHORTCUT";
     private static final String TAG = ShortCutUtils.class.getSimpleName();
+    private static final String SP_SHORT_CUT_AUTO_BUILD = "short_cut_auto_build";
 
     /**
-     * 启动的activity需要加入行为
-     *<intent-filter>
-     <action android:name="android.intent.action.CREATE_SHORTCUT"/>
-     <action android:name="com.android.launcher.action.INSTALL_SHORTCUT" />
-     </intent-filter>
+     * 自动添加shortCut
+     * 用于首页添加
      * @param context
      * @param scName
      * @param scIconId
      * @param launchActivity
      */
-    public static void addShortCut(Context context,String scName,int scIconId,Class launchActivity){
+    public static void autoAddShortCutOnce(Context context, String scName, int scIconId, Class launchActivity){
+        SharedPreferences sharedPreferences = context.getSharedPreferences(SP_SHORT_CUT_AUTO_BUILD, Context.MODE_PRIVATE);
+        boolean hasAdded= sharedPreferences.getBoolean(SP_SHORT_CUT_AUTO_BUILD, false);
+        if(hasAdded){
+            return;
+        }
+        SharedPreferences.Editor edit = sharedPreferences.edit();
+        edit.putBoolean(SP_SHORT_CUT_AUTO_BUILD,true);
+        edit.apply();
 
+        addShortCut(context,scName,scIconId,launchActivity);
+    }
+
+    public static void autoAddShortCutOnceByName(Context context, String scName, int scIconId, String bName,Class launchActivity){
+        SharedPreferences sharedPreferences = context.getSharedPreferences(SP_SHORT_CUT_AUTO_BUILD, Context.MODE_PRIVATE);
+        boolean hasAdded= sharedPreferences.getBoolean(SP_SHORT_CUT_AUTO_BUILD, false);
+        if(hasAdded){
+            return;
+        }
+        SharedPreferences.Editor edit = sharedPreferences.edit();
+        StringBuffer sb = new StringBuffer();
+        sb.append(SP_SHORT_CUT_AUTO_BUILD).append(bName);
+        edit.putBoolean(sb.toString(),true);
+        edit.apply();
+
+        addShortCut(context,scName,scIconId,launchActivity);
+    }
+
+    /**
+     * 启动的activity需要加入行为
+     * <intent-filter>
+     * <action android:name="android.intent.action.CREATE_SHORTCUT"/>
+     * <action android:name="com.android.launcher.action.INSTALL_SHORTCUT" />
+     * </intent-filter>
+     *
+     * @param context
+     * @param scName
+     * @param scIconId
+     * @param launchActivity
+     */
+    public static void addShortCut(Context context, String scName, int scIconId, Class launchActivity) {
+
+        //vivo等部分机型不适合该方法，防止自动多创建多个快件键，故使用sharePreference
 //        if(hasShortcut(context,scName)){
 ////            removeShortcut(context,scName,launchActivity);
 //            Log.d(TAG,"hasShortcut");
 //        }else{
 //            Log.d(TAG,"addShortCut");
 //        }
+
         Intent launcherIntent = new Intent(Intent.ACTION_MAIN);
         launcherIntent.setClass(context, launchActivity);
+        launcherIntent.setAction(Intent.ACTION_CREATE_SHORTCUT);
         launcherIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//        launcherIntent.addCategory(Intent.CATEGORY_LAUNCHER); //不能加入该句 oppo手机无法使用 因为再fest文件已经对MainActivity做了声明
-        addShortCut(context,scName,scIconId,launcherIntent);
+        //不能加入该句 oppo手机无法使用快捷方式 因为再fest文件已经对MainActivity做了声明
+        //launcherIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+        addShortCut(context, scName, scIconId, launcherIntent);
     }
-    public static void addShortCut(Context context,String scName,int scIconId,Intent launchIntent){
+
+    public static void addShortCut(Context context, String scName, int scIconId, Intent launchIntent) {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            addShortCutAboveO(context,scName,scIconId,launchIntent);
-        }else{
-            addShortCutBelowO(context,scName,scIconId,launchIntent);
+            addShortCutAboveO(context, scName, scIconId, launchIntent);
+        } else {
+            addShortCutBelowO(context, scName, scIconId, launchIntent);
         }
     }
 
-    private static void addShortCutBelowO(Context context,String scName,int scIconId,Intent launchIntent){
+    private static void addShortCutBelowO(Context context, String scName, int scIconId, Intent launchIntent) {
         Intent addShortcutIntent = new Intent(ACTION_ADD_SHORTCUT);
         // 不允许重复创建，不是根据快捷方式的名字判断重复的
         //小米手机 version < 8.0 设置为false 不能创建出icon
@@ -88,11 +132,13 @@ public class ShortCutUtils {
     }
 
     @TargetApi(Build.VERSION_CODES.O)
-    private static void addShortCutAboveO(Context context, String scName, int scIconId, Intent launchIntent){
+    private static void addShortCutAboveO(Context context, String scName, int scIconId, Intent launchIntent) {
         ShortcutManager shortcutManager = (ShortcutManager) context.getSystemService(Context.SHORTCUT_SERVICE);
-        if (shortcutManager!=null&&shortcutManager.isRequestPinShortcutSupported()) {
+        if (shortcutManager != null && shortcutManager.isRequestPinShortcutSupported()) {
             Intent shortcutInfoIntent = new Intent(context, ShortCutActivity.class);
-            shortcutInfoIntent.setAction(Intent.ACTION_VIEW); //action必须设置，不然报错
+//            shortcutInfoIntent.setAction(Intent.ACTION_VIEW); //action必须设置，不然报错
+            shortcutInfoIntent.setAction(Intent.ACTION_CREATE_SHORTCUT); //action必须设置，不然报错
+
             ShortcutInfo info = new ShortcutInfo.Builder(context, "The only id")
                     .setIcon(Icon.createWithResource(context, scIconId))
                     .setShortLabel(scName)
@@ -103,7 +149,8 @@ public class ShortCutUtils {
             shortcutManager.requestPinShortcut(info, shortcutCallbackIntent.getIntentSender());
         }
     }
-    private static void removeShortcut(Context context,String name,Class launchActivity) {
+
+    private static void removeShortcut(Context context, String name, Class launchActivity) {
         // remove shortcut的方法在小米系统上不管用，在三星上可以移除
         Intent intent = new Intent(ACTION_REMOVE_SHORTCUT);
         // 名字
@@ -132,8 +179,8 @@ public class ShortCutUtils {
                 if (provider.readPermission == null) {
                     continue;
                 }
-                Log.d(TAG,provider.readPermission);
-                Log.d(TAG,provider.authority);
+                Log.d(TAG, provider.readPermission);
+                Log.d(TAG, provider.authority);
                 if (Pattern.matches(".*launcher.*READ_SETTINGS", provider.readPermission)) {
                     return provider.authority;
                 }
@@ -144,30 +191,31 @@ public class ShortCutUtils {
 
     /**
      * oppo 无效 小米有效
+     *
      * @param context
      * @param appName
      * @return
      */
     private static boolean hasShortcut(Context context, String appName) {
-        Log.d(TAG,appName);
+        Log.d(TAG, appName);
         String authority = getAuthorityFromPermission(context);
         if (authority == null) {
             return false;
         }
         String url = "content://" + authority + "/favorites?notify=true";
-        Log.d(TAG,"url_"+url);
+        Log.d(TAG, "url_" + url);
         try {
             Uri CONTENT_URI = Uri.parse(url);
-            Cursor c = context.getContentResolver().query(CONTENT_URI, new String[] { "title" }, "title=?", new String[] { appName },null);
+            Cursor c = context.getContentResolver().query(CONTENT_URI, new String[]{"title"}, "title=?", new String[]{appName}, null);
             if (c != null && c.moveToNext()) {
                 c.close();
-                Log.d(TAG,"TRUE");
+                Log.d(TAG, "TRUE");
                 return true;
             }
         } catch (Exception e) {
             return false;
         }
-        Log.d(TAG,"FALSE");
+        Log.d(TAG, "FALSE");
         return false;
     }
 
