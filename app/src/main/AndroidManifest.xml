@@ -51,6 +51,9 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <!--Android N 以上的快捷方式  小米桌面不支持-->
+            <meta-data  android:name="android.app.shortcuts"
+                android:resource="@xml/shortcuts"/>
         </activity>
         <activity android:name=".test.ShortCutActivity">
 
@@ -59,12 +62,6 @@
         <receiver android:name=".test.ShortCurReceiver" />
 
         <activity android:name=".test.TestShortCutActivity" >
-            <intent-filter>
-                <action android:name="android.intent.action.CREATE_SHORTCUT" />
-                <action android:name="com.android.launcher.action.INSTALL_SHORTCUT" />
-            </intent-filter>
-        </activity>
-        <activity android:name=".test.ShortCutTest2Activity">
             <intent-filter>
                 <action android:name="android.intent.action.CREATE_SHORTCUT" />
                 <action android:name="com.android.launcher.action.INSTALL_SHORTCUT" />

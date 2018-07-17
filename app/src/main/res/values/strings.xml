@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">HelloWorld</string>
+
+    <string name="static_one_long_label">static_one_long_label</string>
+    <string name="static_disabled_message">static_disabled_message</string>
+    <string name="static_one_short_label">static_one_short_label</string>
 </resources>
