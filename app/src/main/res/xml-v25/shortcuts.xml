@@ -16,7 +16,7 @@
         <intent
             android:action="android.intent.action.MAIN"
             android:targetPackage="com.ihemingway.helloworld"
-            android:targetClass="com.ihemingway.helloworld.test.TestShortCutActivity"/>
+            android:targetClass="com.ihemingway.helloworld.shortcut.TestShortCutActivity"/>
 
         <intent
             android:action="android.intent.action.MAIN"

@@ -1,4 +1,4 @@
-package com.ihemingway.helloworld.test;
+package com.ihemingway.helloworld.shortcut;
 
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;

@@ -1,4 +1,4 @@
-package com.ihemingway.helloworld.test;
+package com.ihemingway.helloworld.shortcut;
 
 import android.annotation.TargetApi;
 import android.app.PendingIntent;
@@ -93,22 +93,16 @@ public class ShortCutUtils {
 //        }else{
 //            Log.d(TAG,"addShortCut");
 //        }
-
         Intent launcherIntent = new Intent(Intent.ACTION_MAIN);
         launcherIntent.setClass(context, launchActivity);
         launcherIntent.setAction(Intent.ACTION_CREATE_SHORTCUT);
         launcherIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         //不能加入该句 oppo手机无法使用快捷方式 因为再fest文件已经对MainActivity做了声明
         //launcherIntent.addCategory(Intent.CATEGORY_LAUNCHER);
-        addShortCut(context, scName, scIconId, launcherIntent);
-    }
-
-    public static void addShortCut(Context context, String scName, int scIconId, Intent launchIntent) {
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            addShortCutAboveO(context, scName, scIconId, launchIntent);
+            addShortCutAboveO(context, scName, scIconId, launcherIntent,launchActivity.getSimpleName());
         } else {
-            addShortCutBelowO(context, scName, scIconId, launchIntent);
+            addShortCutBelowO(context, scName, scIconId, launcherIntent);
         }
     }
 
@@ -132,17 +126,13 @@ public class ShortCutUtils {
     }
 
     @TargetApi(Build.VERSION_CODES.O)
-    private static void addShortCutAboveO(Context context, String scName, int scIconId, Intent launchIntent) {
+    private static void addShortCutAboveO(Context context, String scName, int scIconId, Intent launchIntent, String simpleName) {
         ShortcutManager shortcutManager = (ShortcutManager) context.getSystemService(Context.SHORTCUT_SERVICE);
         if (shortcutManager != null && shortcutManager.isRequestPinShortcutSupported()) {
-            Intent shortcutInfoIntent = new Intent(context, ShortCutActivity.class);
-//            shortcutInfoIntent.setAction(Intent.ACTION_VIEW); //action必须设置，不然报错
-            shortcutInfoIntent.setAction(Intent.ACTION_CREATE_SHORTCUT); //action必须设置，不然报错
-
-            ShortcutInfo info = new ShortcutInfo.Builder(context, "The only id")
+            ShortcutInfo info = new ShortcutInfo.Builder(context, simpleName)
                     .setIcon(Icon.createWithResource(context, scIconId))
                     .setShortLabel(scName)
-                    .setIntent(shortcutInfoIntent)
+                    .setIntent(launchIntent)
                     .build();
             //当添加快捷方式的确认弹框弹出来时，将被回调
             PendingIntent shortcutCallbackIntent = PendingIntent.getBroadcast(context, 0, launchIntent, PendingIntent.FLAG_UPDATE_CURRENT);

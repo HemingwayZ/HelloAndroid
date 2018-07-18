@@ -3,7 +3,7 @@ package com.ihemingway.helloworld
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import com.ihemingway.helloworld.test.ShortCutActivity
+import com.ihemingway.helloworld.shortcut.ShortCutActivity
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
@@ -21,7 +21,7 @@ class MainActivity : AppCompatActivity() {
 
     fun startActivity1(){
         var intent = Intent(Intent.ACTION_CREATE_SHORTCUT)
-        intent.setClass(this,ShortCutActivity::class.java)
+        intent.setClass(this, ShortCutActivity::class.java)
 //        intent.setAction()
         startActivityForResult(intent,100)
     }

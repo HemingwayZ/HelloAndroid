@@ -55,13 +55,13 @@
             <meta-data  android:name="android.app.shortcuts"
                 android:resource="@xml/shortcuts"/>
         </activity>
-        <activity android:name=".test.ShortCutActivity">
+        <activity android:name=".shortcut.ShortCutActivity">
 
         </activity>
 
-        <receiver android:name=".test.ShortCurReceiver" />
+        <receiver android:name=".shortcut.ShortCurReceiver" />
 
-        <activity android:name=".test.TestShortCutActivity" >
+        <activity android:name=".shortcut.TestShortCutActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.CREATE_SHORTCUT" />
                 <action android:name="com.android.launcher.action.INSTALL_SHORTCUT" />
