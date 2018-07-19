@@ -87,12 +87,14 @@ public class ShortCutUtils {
     public static void addShortCut(Context context, String scName, int scIconId, Class launchActivity) {
 
         //vivo等部分机型不适合该方法，防止自动多创建多个快件键，故使用sharePreference
-//        if(hasShortcut(context,scName)){
-////            removeShortcut(context,scName,launchActivity);
-//            Log.d(TAG,"hasShortcut");
-//        }else{
-//            Log.d(TAG,"addShortCut");
-//        }
+        //有效机型 小米
+        if(hasShortcut(context,scName)){
+//            removeShortcut(context,scName,launchActivity);
+            Log.d(TAG,"hasShortcut");
+            return;
+        }else{
+            Log.d(TAG,"addShortCut");
+        }
         Intent launcherIntent = new Intent(Intent.ACTION_MAIN);
         launcherIntent.setClass(context, launchActivity);
         launcherIntent.setAction(Intent.ACTION_CREATE_SHORTCUT);
@@ -162,7 +164,8 @@ public class ShortCutUtils {
         if (resolveInfo == null) {
             return null;
         }
-        List<ProviderInfo> info = mPackageManager.queryContentProviders(resolveInfo.activityInfo.packageName, resolveInfo.activityInfo.applicationInfo.uid, PackageManager.GET_PROVIDERS);
+//        PackageManager.MATCH_DEFAULT_ONLY PackageManager.GET_PROVIDERS
+        List<ProviderInfo> info = mPackageManager.queryContentProviders(resolveInfo.activityInfo.packageName, resolveInfo.activityInfo.applicationInfo.uid, PackageManager.MATCH_DEFAULT_ONLY);
         if (info != null) {
             for (int j = 0; j < info.size(); j++) {
                 ProviderInfo provider = info.get(j);
@@ -186,7 +189,7 @@ public class ShortCutUtils {
      * @param appName
      * @return
      */
-    private static boolean hasShortcut(Context context, String appName) {
+    public static boolean hasShortcut(Context context, String appName) {
         Log.d(TAG, appName);
         String authority = getAuthorityFromPermission(context);
         if (authority == null) {
@@ -196,7 +199,7 @@ public class ShortCutUtils {
         Log.d(TAG, "url_" + url);
         try {
             Uri CONTENT_URI = Uri.parse(url);
-            Cursor c = context.getContentResolver().query(CONTENT_URI, new String[]{"title"}, "title=?", new String[]{appName}, null);
+            Cursor c = context.getContentResolver().query(CONTENT_URI, new String[]{"title"}, "title = ?", new String[]{appName}, null);
             if (c != null && c.moveToNext()) {
                 c.close();
                 Log.d(TAG, "TRUE");
