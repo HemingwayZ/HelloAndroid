@@ -6,6 +6,7 @@
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/editpic/editpic.iml" filepath="$PROJECT_DIR$/editpic/editpic.iml" />
       <module fileurl="file://$PROJECT_DIR$/libhellosponge/libhellosponge.iml" filepath="$PROJECT_DIR$/libhellosponge/libhellosponge.iml" />
+      <module fileurl="file://$PROJECT_DIR$/mbprintservice/mbprintservice.iml" filepath="$PROJECT_DIR$/mbprintservice/mbprintservice.iml" />
     </modules>
   </component>
 </project>

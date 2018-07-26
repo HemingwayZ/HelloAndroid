@@ -1,1 +1,1 @@
-include ':app', ':editpic', ':libhellosponge'
+include ':app', ':editpic', ':libhellosponge', ':mbprintservice'

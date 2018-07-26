@@ -11,6 +11,7 @@
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/editpic" />
             <option value="$PROJECT_DIR$/libhellosponge" />
+            <option value="$PROJECT_DIR$/mbprintservice" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />
