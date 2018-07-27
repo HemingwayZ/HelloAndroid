@@ -33,6 +33,7 @@ public class MbPrinterDiscoverySession extends PrinterDiscoverySession {
     private static final String TAG = "PrinterDiscoverySession";
     private BluetoothAdapter mBluetoothAdapter;
     private final MbPrintService mbPrintService;
+
     public MbPrinterDiscoverySession(MbPrintService mbPrintService, BluetoothAdapter mBluetoothAdapter) {
         this.mbPrintService = mbPrintService;
         // Initializes Bluetooth adapter.
@@ -45,16 +46,15 @@ public class MbPrinterDiscoverySession extends PrinterDiscoverySession {
         final List<PrinterInfo> printers = this.getPrinters();
 
 
-
         //BLE
-        if(mBluetoothAdapter!=null){
+        if (mBluetoothAdapter != null) {
             //生成一个假的
             final String name = "HemingwayTest";
             PrinterInfo myprinter = new PrinterInfo
                     .Builder(mbPrintService.generatePrinterId(name), name, PrinterInfo.STATUS_IDLE)
                     .build();
             printers.add(myprinter);
-
+            addPrinters(printers);
 //            mBluetoothAdapter.startLeScan(new BluetoothAdapter.LeScanCallback() {
 //                @Override
 //                public void onLeScan(BluetoothDevice bluetoothDevice, int i, byte[] bytes) {
@@ -76,35 +76,32 @@ public class MbPrinterDiscoverySession extends PrinterDiscoverySession {
                     public void run() {
                         mBluetoothAdapter.getBluetoothLeScanner().startScan(callBack);
                     }
-                },200);
+                }, 200);
 
             }
         }
-        addPrinters(printers);
+
     }
 
 
-    private ScanCallback callBack =  new ScanCallback() {
+    private ScanCallback callBack = new ScanCallback() {
         @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
         @Override
         public void onScanResult(int callbackType, ScanResult result) {
             BluetoothDevice device = result.getDevice();
             String deviceName = device.getName();
-            if(deviceName==null){
+            if (deviceName == null) {
                 deviceName = "";
             }
-            if(TextUtils.equals(deviceName.toLowerCase(),"XXX")
-                    ||TextUtils.equals(deviceName.toLowerCase(),"XXX")){
+            Log.d(TAG,deviceName+" "+device.getAddress());
+            if (DeviceUtils.isLegalDevice(deviceName)) {
+                deviceName = deviceName+"\n"+device.getAddress();
                 PrinterInfo myprinter = new PrinterInfo
-                        .Builder(mbPrintService.generatePrinterId(result.getDevice().getAddress()), deviceName, PrinterInfo.STATUS_IDLE)
+                        .Builder(mbPrintService.generatePrinterId(device.getAddress()), deviceName, PrinterInfo.STATUS_IDLE)
                         .build();
                 List<PrinterInfo> printers = MbPrinterDiscoverySession.this.getPrinters();
-
-                if(myprinter!=null&&printers!=null){
-                    printers.add(myprinter);
-                    addPrinters(printers);
-                }
-
+                printers.add(myprinter);
+                addPrinters(printers);
             }
 
             super.onScanResult(callbackType, result);
@@ -120,6 +117,7 @@ public class MbPrinterDiscoverySession extends PrinterDiscoverySession {
             super.onScanFailed(errorCode);
         }
     };
+
     @Override
     public void onStopPrinterDiscovery() {
         Log.d(TAG, "onStopPrinterDiscovery()");
@@ -129,6 +127,7 @@ public class MbPrinterDiscoverySession extends PrinterDiscoverySession {
     public void onValidatePrinters(@NonNull List<PrinterId> list) {
         Log.d(TAG, "onValidatePrinters()");
     }
+
     private PrinterInfo findPrinterInfo(PrinterId printerId) {
         List<PrinterInfo> printers = getPrinters();
         final int printerCount = getPrinters().size();
@@ -140,8 +139,10 @@ public class MbPrinterDiscoverySession extends PrinterDiscoverySession {
         }
         return null;
     }
+
     /**
      * 选择打印机时调用该方法更新打印机的状态，能力
+     *
      * @param printerId
      */
     @Override
@@ -169,8 +170,9 @@ public class MbPrinterDiscoverySession extends PrinterDiscoverySession {
             List<PrinterInfo> printers = new ArrayList<>();
 
             printers.add(printer);
-            Log.d(TAG,printer.getName());
-            Log.d(TAG,printer.toString());
+            mbPrintService.setPrintId(printerId);
+            Log.d(TAG, printer.getName());
+            Log.d(TAG, printer.toString());
 
             addPrinters(printers);
         }

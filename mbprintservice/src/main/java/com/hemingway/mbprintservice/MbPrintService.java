@@ -2,12 +2,16 @@ package com.hemingway.mbprintservice;
 
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothGatt;
+import android.bluetooth.BluetoothGattCallback;
 import android.bluetooth.BluetoothManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
 import android.os.ParcelFileDescriptor;
 import android.print.PrintJobInfo;
+import android.print.PrinterId;
 import android.printservice.PrintDocument;
 import android.printservice.PrintJob;
 import android.printservice.PrintService;
@@ -23,6 +27,8 @@ import java.io.IOException;
 public class MbPrintService extends PrintService {
     private static final String TAG = "MbPrintService";
     private BluetoothAdapter mBluetoothAdapter;
+    private PrinterId printId;
+
     public MbPrintService() {
     }
 
@@ -48,15 +54,30 @@ public class MbPrintService extends PrintService {
     }
 
     @Override
-    protected void onPrintJobQueued(PrintJob printJob) {
+    protected void onPrintJobQueued(final PrintJob printJob) {
         Log.d(TAG, "onPrintJobQueued()");
         PrintJobInfo printjobinfo = printJob.getInfo();
         PrintDocument printdocument = printJob.getDocument();
-        if (printJob.isQueued()) {
-            return;
-        }
+//        if (printJob.isQueued()) {
+//            return;
+//        }
         printJob.start();
+        if(printId!=null){
+            BluetoothDevice remoteDevice = mBluetoothAdapter.getRemoteDevice(printId.getLocalId());
+            if(remoteDevice!=null){
+                remoteDevice.connectGatt(this, true, new BluetoothGattCallback() {
+                    @Override
+                    public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
+                        Log.d(TAG,"status _ "+status);
+                        super.onConnectionStateChange(gatt, status, newState);
+                        printJob.complete();
+                    }
 
+                });
+            }
+        }
+
+//        mBluetoothAdapter.getRemoteDevice(printJob.);
 //        String filename = "docu.pdf";
 //        File outfile = new File(this.getFilesDir(), filename);
 //        outfile.delete();
@@ -85,7 +106,10 @@ public class MbPrintService extends PrintService {
 //            }
 //        }
 
-        printJob.complete();
+
     }
 
+    public void setPrintId(PrinterId printId) {
+        this.printId = printId;
+    }
 }
