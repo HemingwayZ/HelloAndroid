@@ -19,6 +19,11 @@ import android.printservice.PrinterDiscoverySession;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.clj.fastble.BleManager;
+import com.clj.fastble.callback.BleGattCallback;
+import com.clj.fastble.data.BleDevice;
+import com.clj.fastble.exception.BleException;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -30,12 +35,21 @@ public class MbPrintService extends PrintService {
     private PrinterId printId;
 
     public MbPrintService() {
+
     }
 
     @Nullable
     @Override
     protected PrinterDiscoverySession onCreatePrinterDiscoverySession() {
         Log.d(TAG, "onCreatePrinterDiscoverySession()");
+        BleManager.getInstance().init(getApplication());
+        BleManager.getInstance()
+                .enableLog(true)
+                .setReConnectCount(1, 5000)
+                .setSplitWriteNum(20)
+                .setConnectOverTime(10000)
+                .setOperateTimeout(5000);
+
         final BluetoothManager bluetoothManager =
                 (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
         if(bluetoothManager!=null){
@@ -63,18 +77,27 @@ public class MbPrintService extends PrintService {
 //        }
         printJob.start();
         if(printId!=null){
-            BluetoothDevice remoteDevice = mBluetoothAdapter.getRemoteDevice(printId.getLocalId());
-            if(remoteDevice!=null){
-                remoteDevice.connectGatt(this, true, new BluetoothGattCallback() {
-                    @Override
-                    public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
-                        Log.d(TAG,"status _ "+status);
-                        super.onConnectionStateChange(gatt, status, newState);
-                        printJob.complete();
-                    }
+            BleManager.getInstance().connect(printId.getLocalId(), new BleGattCallback() {
+                @Override
+                public void onStartConnect() {
 
-                });
-            }
+                }
+
+                @Override
+                public void onConnectFail(BleDevice bleDevice, BleException exception) {
+
+                }
+
+                @Override
+                public void onConnectSuccess(BleDevice bleDevice, BluetoothGatt gatt, int status) {
+                    printJob.complete();
+                }
+
+                @Override
+                public void onDisConnected(boolean isActiveDisConnected, BleDevice bleDevice, BluetoothGatt gatt, int status) {
+
+                }
+            });
         }
 
 //        mBluetoothAdapter.getRemoteDevice(printJob.);

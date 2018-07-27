@@ -2,11 +2,8 @@ package com.hemingway.mbprintservice;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothManager;
 import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanResult;
-import android.content.Context;
-import android.content.Intent;
 import android.os.Build;
 import android.os.Handler;
 import android.print.PrintAttributes;
@@ -16,9 +13,11 @@ import android.print.PrinterInfo;
 import android.printservice.PrinterDiscoverySession;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
-import android.text.TextUtils;
 import android.util.Log;
-import android.widget.Toast;
+
+import com.clj.fastble.BleManager;
+import com.clj.fastble.callback.BleScanCallback;
+import com.clj.fastble.data.BleDevice;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,56 +32,139 @@ public class MbPrinterDiscoverySession extends PrinterDiscoverySession {
     private static final String TAG = "PrinterDiscoverySession";
     private BluetoothAdapter mBluetoothAdapter;
     private final MbPrintService mbPrintService;
+    private Handler mHandler;
 
+    boolean isDestroy = false;
     public MbPrinterDiscoverySession(MbPrintService mbPrintService, BluetoothAdapter mBluetoothAdapter) {
         this.mbPrintService = mbPrintService;
         // Initializes Bluetooth adapter.
+        mHandler = new Handler();
         this.mBluetoothAdapter = mBluetoothAdapter;
     }
+
 
     @Override
     public void onStartPrinterDiscovery(@NonNull List<PrinterId> list) {
         Log.d(TAG, "startPrinterDiscovery");
-        final List<PrinterInfo> printers = this.getPrinters();
-
-
+//        final List<PrinterInfo> printers = this.getPrinters();
         //BLE
         if (mBluetoothAdapter != null) {
             //生成一个假的
-            final String name = "HemingwayTest";
-            PrinterInfo myprinter = new PrinterInfo
-                    .Builder(mbPrintService.generatePrinterId(name), name, PrinterInfo.STATUS_IDLE)
-                    .build();
-            printers.add(myprinter);
-            addPrinters(printers);
-//            mBluetoothAdapter.startLeScan(new BluetoothAdapter.LeScanCallback() {
-//                @Override
-//                public void onLeScan(BluetoothDevice bluetoothDevice, int i, byte[] bytes) {
-//                    StringBuffer sb = new StringBuffer();
-//                    sb.append(bluetoothDevice.getName()).append("-")
-//                            .append(bluetoothDevice.getAddress());
-//                    PrinterInfo myprinter = new PrinterInfo
-//                            .Builder(mbPrintService.generatePrinterId(sb.toString()), toString(), PrinterInfo.STATUS_IDLE)
-//                            .build();
-//                    printers.add(myprinter);
-//                }
-//            });
+//            final String name = "HemingwayTest";
+//            PrinterInfo myprinter = new PrinterInfo
+//                    .Builder(mbPrintService.generatePrinterId(name), name, PrinterInfo.STATUS_IDLE)
+//                    .build();
+//            printers.add(myprinter);
+//            addPrinters(printers);
+//
+//            scanLeDevice(true);
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+//                mBluetoothAdapter.getBluetoothLeScanner().stopScan(callBack);
+//                new Handler().postDelayed(new Runnable() {
+//                    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+//                    @Override
+//                    public void run() {
+//                        mBluetoothAdapter.getBluetoothLeScanner().startScan(callBack);
+//                    }
+//                }, 200);
+//
+//            }
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                mBluetoothAdapter.getBluetoothLeScanner().stopScan(callBack);
-                new Handler().postDelayed(new Runnable() {
-                    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-                    @Override
-                    public void run() {
-                        mBluetoothAdapter.getBluetoothLeScanner().startScan(callBack);
-                    }
-                }, 200);
-
-            }
+            easyScan();
         }
 
     }
 
+    private void easyScan() {
+        BleManager.getInstance().scan(new BleScanCallback() {
+            @Override
+            public void onScanStarted(boolean success) {
+
+            }
+
+            @Override
+            public void onScanning(BleDevice bleDevice) {
+                if(isDestroy){
+                    return;
+                }
+                BluetoothDevice device = bleDevice.getDevice();
+                String deviceName = bleDevice.getName();
+                if (deviceName == null) {
+                    deviceName = "";
+                }
+                Log.d(TAG,deviceName+" "+device.getAddress());
+                if (DeviceUtils.isLegalDevice(deviceName)) {
+                    deviceName = deviceName+"\n"+device.getAddress();
+                    PrinterInfo myprinter = new PrinterInfo
+                            .Builder(mbPrintService.generatePrinterId(device.getAddress()), deviceName, PrinterInfo.STATUS_IDLE)
+                            .build();
+                    List<PrinterInfo> printers = MbPrinterDiscoverySession.this.getPrinters();
+                    printers.add(myprinter);
+                    addPrinters(printers);
+                }
+            }
+
+            @Override
+            public void onScanFinished(List<BleDevice> scanResultList) {
+
+            }
+        });
+    }
+
+    // Stops scanning after 10 seconds.
+    private static final long SCAN_PERIOD = 10000;
+    private boolean mScanning;
+    private void scanLeDevice(final boolean enable) {
+        if (enable) {
+            // Stops scanning after a pre-defined scan period.
+//            mHandler.postDelayed(new Runnable() {
+//                @Override
+//                public void run() {
+//                    if(isDestroy) {
+//                        return;
+//                    }
+//                        mScanning = false;
+//                        mBluetoothAdapter.stopLeScan(mLeScanCallback);
+//
+//                }
+//            }, SCAN_PERIOD);
+
+            mScanning = true;
+            boolean b = mBluetoothAdapter.startLeScan(mLeScanCallback);
+            //开始扫描失败
+            if(!b){
+                Log.d(TAG,"Start Scan failed");
+            }
+        } else {
+            mScanning = false;
+            mBluetoothAdapter.stopLeScan(mLeScanCallback);
+        }
+    }
+    // Device scan callback.
+    private BluetoothAdapter.LeScanCallback mLeScanCallback =
+            new BluetoothAdapter.LeScanCallback() {
+
+                @Override
+                public void onLeScan(final BluetoothDevice device, int rssi, byte[] scanRecord) {
+                    if(isDestroy){
+                        return;
+                    }
+                    String deviceName = device.getName();
+                    if (deviceName == null) {
+                        deviceName = "";
+                    }
+                    Log.d(TAG,deviceName+" "+device.getAddress());
+                    if (DeviceUtils.isLegalDevice(deviceName)) {
+                        deviceName = deviceName+"\n"+device.getAddress();
+                        PrinterInfo myprinter = new PrinterInfo
+                                .Builder(mbPrintService.generatePrinterId(device.getAddress()), deviceName, PrinterInfo.STATUS_IDLE)
+                                .build();
+                        List<PrinterInfo> printers = MbPrinterDiscoverySession.this.getPrinters();
+                        printers.add(myprinter);
+                        addPrinters(printers);
+                    }
+                }
+            };
 
     private ScanCallback callBack = new ScanCallback() {
         @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -100,8 +182,13 @@ public class MbPrinterDiscoverySession extends PrinterDiscoverySession {
                         .Builder(mbPrintService.generatePrinterId(device.getAddress()), deviceName, PrinterInfo.STATUS_IDLE)
                         .build();
                 List<PrinterInfo> printers = MbPrinterDiscoverySession.this.getPrinters();
-                printers.add(myprinter);
-                addPrinters(printers);
+                //关闭服务之后是异步操作
+                try {
+                    printers.add(myprinter);
+                    addPrinters(printers);
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
             }
 
             super.onScanResult(callbackType, result);
@@ -121,6 +208,8 @@ public class MbPrinterDiscoverySession extends PrinterDiscoverySession {
     @Override
     public void onStopPrinterDiscovery() {
         Log.d(TAG, "onStopPrinterDiscovery()");
+//        scanLeDevice(false);
+        BleManager.getInstance().cancelScan();
     }
 
     @Override
@@ -180,11 +269,13 @@ public class MbPrinterDiscoverySession extends PrinterDiscoverySession {
 
     @Override
     public void onStopPrinterStateTracking(@NonNull PrinterId printerId) {
-        Log.d(TAG, "onStopPrinterStateTracking()");
+
     }
 
     @Override
     public void onDestroy() {
+        isDestroy = true;
+        mHandler.removeCallbacksAndMessages(null);
         Log.d(TAG, "onDestroy()");
     }
 }
