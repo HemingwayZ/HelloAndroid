@@ -1,15 +1,10 @@
 package com.hemingway.mbprintservice;
 
-import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
-import android.bluetooth.BluetoothGattCallback;
 import android.bluetooth.BluetoothManager;
 import android.content.Context;
 import android.content.Intent;
-import android.os.IBinder;
-import android.os.ParcelFileDescriptor;
 import android.print.PrintJobInfo;
 import android.print.PrinterId;
 import android.printservice.PrintDocument;
@@ -18,16 +13,13 @@ import android.printservice.PrintService;
 import android.printservice.PrinterDiscoverySession;
 import android.support.annotation.Nullable;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.clj.fastble.BleManager;
 import com.clj.fastble.callback.BleGattCallback;
+import com.clj.fastble.callback.BleReadCallback;
 import com.clj.fastble.data.BleDevice;
 import com.clj.fastble.exception.BleException;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
 
 public class MbPrintService extends PrintService {
     private static final String TAG = "MbPrintService";
@@ -90,6 +82,9 @@ public class MbPrintService extends PrintService {
 
                 @Override
                 public void onConnectSuccess(BleDevice bleDevice, BluetoothGatt gatt, int status) {
+                    connectSuccess(bleDevice, gatt, status);
+
+                    Toast.makeText(MbPrintService.this,"连接成功",Toast.LENGTH_LONG).show();
                     printJob.complete();
                 }
 
@@ -130,6 +125,24 @@ public class MbPrintService extends PrintService {
 //        }
 
 
+    }
+    // 蓝牙串口服务UUID
+    public static final String uuid = "00001101-0000-1000-8000-00805F9B34FB";
+    private void connectSuccess(BleDevice bleDevice, BluetoothGatt gatt, int status) {
+        BleManager.getInstance().read(bleDevice, uuid, uuid
+                , new BleReadCallback() {
+                    @Override
+                    public void onReadSuccess(byte[] data) {
+                        String str = new String(data);
+                        Log.d(TAG,str);
+                        Toast.makeText(MbPrintService.this,str,Toast.LENGTH_LONG).show();
+                    }
+
+                    @Override
+                    public void onReadFailure(BleException exception) {
+                        Toast.makeText(MbPrintService.this,exception.getDescription(),Toast.LENGTH_LONG).show();
+                    }
+                });
     }
 
     public void setPrintId(PrinterId printId) {

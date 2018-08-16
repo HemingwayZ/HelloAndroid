@@ -3,6 +3,7 @@ package com.ihemingway.helloworld
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import com.ihemingway.helloworld.filereader.FileReaderActivity
 import com.ihemingway.helloworld.shortcut.ShortCutActivity
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -13,7 +14,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         // Example of a call to a native method
-        tvHello.text = stringFromJNI()
+//        tvHello.text = stringFromJNI()
         tvHello.setOnClickListener {
             startActivity1()
         }
@@ -21,7 +22,7 @@ class MainActivity : AppCompatActivity() {
 
     fun startActivity1(){
         var intent = Intent(Intent.ACTION_CREATE_SHORTCUT)
-        intent.setClass(this, ShortCutActivity::class.java)
+        intent.setClass(this, FileReaderActivity::class.java)
 //        intent.setAction()
         startActivityForResult(intent,100)
     }
@@ -31,11 +32,11 @@ class MainActivity : AppCompatActivity() {
      */
     external fun stringFromJNI(): String
 
-    companion object {
-
-        // Used to load the 'native-lib' library on application startup.
-        init {
-            System.loadLibrary("native-lib")
-        }
-    }
+//    companion object {
+//
+//        // Used to load the 'native-lib' library on application startup.
+//        init {
+//            System.loadLibrary("native-lib")
+//        }
+//    }
 }
