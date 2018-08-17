@@ -4,6 +4,7 @@ import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import com.ihemingway.helloworld.filereader.FileReaderActivity
+import com.ihemingway.helloworld.filereader.ReadOfficeActivity
 import com.ihemingway.helloworld.shortcut.ShortCutActivity
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -22,7 +23,7 @@ class MainActivity : AppCompatActivity() {
 
     fun startActivity1(){
         var intent = Intent(Intent.ACTION_CREATE_SHORTCUT)
-        intent.setClass(this, FileReaderActivity::class.java)
+        intent.setClass(this, ReadOfficeActivity::class.java)
 //        intent.setAction()
         startActivityForResult(intent,100)
     }
