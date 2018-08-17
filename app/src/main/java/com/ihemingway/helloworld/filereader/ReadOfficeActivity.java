@@ -1,32 +1,23 @@
 package com.ihemingway.helloworld.filereader;
 
 import android.Manifest;
+import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 
 import com.ihemingway.helloworld.R;
 
-import org.apache.poi.hwpf.HWPFDocument;
-import org.apache.poi.hwpf.converter.PicturesManager;
-import org.apache.poi.hwpf.converter.WordToHtmlConverter;
-import org.apache.poi.hwpf.usermodel.Picture;
-import org.apache.poi.hwpf.usermodel.PictureType;
 import org.apache.poi.xwpf.converter.core.FileImageExtractor;
 import org.apache.poi.xwpf.converter.core.FileURIResolver;
-//import org.apache.poi.xwpf.converter.xhtml.XHTMLConverter;
-//import org.apache.poi.xwpf.converter.xhtml.XHTMLOptions;
 import org.apache.poi.xwpf.converter.xhtml.XHTMLConverter;
 import org.apache.poi.xwpf.converter.xhtml.XHTMLOptions;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
-import org.w3c.dom.Document;
 
 import java.io.BufferedWriter;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -34,19 +25,15 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.util.List;
 
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
 import permissions.dispatcher.NeedsPermission;
 import permissions.dispatcher.RuntimePermissions;
+
+//import org.apache.poi.xwpf.converter.xhtml.XHTMLConverter;
+//import org.apache.poi.xwpf.converter.xhtml.XHTMLOptions;
 
 @RuntimePermissions
 public class ReadOfficeActivity extends AppCompatActivity {
@@ -60,9 +47,9 @@ public class ReadOfficeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_read_office);
 
-        System.setProperty("org.apache.poi.javax.xml.stream.XMLInputFactory", "com.fasterxml.aalto.stax.InputFactoryImpl");
-        System.setProperty("org.apache.poi.javax.xml.stream.XMLOutputFactory", "com.fasterxml.aalto.stax.OutputFactoryImpl");
-        System.setProperty("org.apache.poi.javax.xml.stream.XMLEventFactory", "com.fasterxml.aalto.stax.EventFactoryImpl");
+//        System.setProperty("org.apache.poi.javax.xml.stream.XMLInputFactory", "com.fasterxml.aalto.stax.InputFactoryImpl");
+//        System.setProperty("org.apache.poi.javax.xml.stream.XMLOutputFactory", "com.fasterxml.aalto.stax.OutputFactoryImpl");
+//        System.setProperty("org.apache.poi.javax.xml.stream.XMLEventFactory", "com.fasterxml.aalto.stax.EventFactoryImpl");
 
         name = docName.substring(0, docName.indexOf("."));
         ReadOfficeActivityPermissionsDispatcher.needPermissionWithPermissionCheck(this);
@@ -96,13 +83,7 @@ public class ReadOfficeActivity extends AppCompatActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }finally {
-            if(document!=null) {
-                try {
-                    document.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
+
         }
 
 
@@ -118,51 +99,51 @@ public class ReadOfficeActivity extends AppCompatActivity {
             Log.d("Hemingway", "file is no exist");
             return;
         }
-
-        HWPFDocument wordDocument = new HWPFDocument(new FileInputStream(fileName));
-        WordToHtmlConverter wordToHtmlConverter = new WordToHtmlConverter(
-                DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument());
-
-        //设置图片路径
-        wordToHtmlConverter.setPicturesManager(new PicturesManager() {
-            public String savePicture(byte[] content,
-                                      PictureType pictureType, String suggestedName,
-                                      float widthInches, float heightInches) {
-                String name = docName.substring(0, docName.indexOf("."));
-                return name + "/" + suggestedName;
-            }
-        });
-
-        //保存图片
-        List<Picture> pics = wordDocument.getPicturesTable().getAllPictures();
-        if (pics != null) {
-            for (int i = 0; i < pics.size(); i++) {
-                Picture pic = (Picture) pics.get(i);
-                System.out.println(pic.suggestFullFileName());
-                try {
-                    String name = docName.substring(0, docName.indexOf("."));
-                    pic.writeImageContent(new FileOutputStream(savePath + name + "/"
-                            + pic.suggestFullFileName()));
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        wordToHtmlConverter.processDocument(wordDocument);
-        Document htmlDocument = wordToHtmlConverter.getDocument();
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        DOMSource domSource = new DOMSource(htmlDocument);
-        StreamResult streamResult = new StreamResult(out);
-
-        TransformerFactory tf = TransformerFactory.newInstance();
-        Transformer serializer = tf.newTransformer();
-        serializer.setOutputProperty(OutputKeys.ENCODING, "utf-8");
-        serializer.setOutputProperty(OutputKeys.INDENT, "yes");
-        serializer.setOutputProperty(OutputKeys.METHOD, "html");
-        serializer.transform(domSource, streamResult);
-        out.close();
-        //保存html文件
-        writeFile(new String(out.toByteArray()), outPutFile);
+//
+//        HWPFDocument wordDocument = new HWPFDocument(new FileInputStream(fileName));
+//        WordToHtmlConverter wordToHtmlConverter = new WordToHtmlConverter(
+//                DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument());
+//
+//        //设置图片路径
+//        wordToHtmlConverter.setPicturesManager(new PicturesManager() {
+//            public String savePicture(byte[] content,
+//                                      PictureType pictureType, String suggestedName,
+//                                      float widthInches, float heightInches) {
+//                String name = docName.substring(0, docName.indexOf("."));
+//                return name + "/" + suggestedName;
+//            }
+//        });
+//
+//        //保存图片
+//        List<Picture> pics = wordDocument.getPicturesTable().getAllPictures();
+//        if (pics != null) {
+//            for (int i = 0; i < pics.size(); i++) {
+//                Picture pic = (Picture) pics.get(i);
+//                System.out.println(pic.suggestFullFileName());
+//                try {
+//                    String name = docName.substring(0, docName.indexOf("."));
+//                    pic.writeImageContent(new FileOutputStream(savePath + name + "/"
+//                            + pic.suggestFullFileName()));
+//                } catch (FileNotFoundException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        }
+//        wordToHtmlConverter.processDocument(wordDocument);
+//        Document htmlDocument = wordToHtmlConverter.getDocument();
+//        ByteArrayOutputStream out = new ByteArrayOutputStream();
+//        DOMSource domSource = new DOMSource(htmlDocument);
+//        StreamResult streamResult = new StreamResult(out);
+//
+//        TransformerFactory tf = TransformerFactory.newInstance();
+//        Transformer serializer = tf.newTransformer();
+//        serializer.setOutputProperty(OutputKeys.ENCODING, "utf-8");
+//        serializer.setOutputProperty(OutputKeys.INDENT, "yes");
+//        serializer.setOutputProperty(OutputKeys.METHOD, "html");
+//        serializer.transform(domSource, streamResult);
+//        out.close();
+//        //保存html文件
+//        writeFile(new String(out.toByteArray()), outPutFile);
     }
 
     /**

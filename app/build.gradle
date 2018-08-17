@@ -8,7 +8,7 @@ android {
     compileSdkVersion 26
     defaultConfig {
         applicationId "com.ihemingway.helloworld"
-        minSdkVersion 16
+        minSdkVersion 21
         targetSdkVersion 21
         versionCode 1
         versionName "1.0"
@@ -26,6 +26,13 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+    }
+    packagingOptions {
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/NOTICE.txt'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/LICENSE.txt'
     }
 //    externalNativeBuild {
 //        cmake {
@@ -52,10 +59,11 @@ dependencies {
     }
     annotationProcessor 'com.github.hotchemi:permissionsdispatcher-processor:3.3.1'
     api 'com.github.johann673:easyar:1.0.0'
-    api 'com.fasterxml:aalto-xml:1.1.0'
+//    api 'com.fasterxml:aalto-xml:1.1.0'
+
     // https://mvnrepository.com/artifact/fr.opensagres.xdocreport/org.apache.poi.xwpf.converter.xhtml
     //    api group: 'fr.opensagres.xdocreport', name: 'org.apache.poi.xwpf.converter.xhtml', version: '1.0.6'
-
+    implementation 'fr.opensagres.xdocreport:org.apache.poi.xwpf.converter.xhtml:1.0.5'
 }
 
 //jar. {
