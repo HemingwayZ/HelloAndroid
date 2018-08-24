@@ -63,7 +63,14 @@ dependencies {
 
     // https://mvnrepository.com/artifact/fr.opensagres.xdocreport/org.apache.poi.xwpf.converter.xhtml
     //    api group: 'fr.opensagres.xdocreport', name: 'org.apache.poi.xwpf.converter.xhtml', version: '1.0.6'
-    implementation 'fr.opensagres.xdocreport:org.apache.poi.xwpf.converter.xhtml:1.0.5'
+    implementation 'fr.opensagres.xdocreport:org.apache.poi.xwpf.converter.xhtml:1.0.6'
+    // https://mvnrepository.com/artifact/fr.opensagres.xdocreport/org.apache.poi.xwpf.converter.pdf
+    implementation 'fr.opensagres.xdocreport:org.apache.poi.xwpf.converter.pdf:1.0.6'
+//    implementation group: 'fr.opensagres.xdocreport', name: 'org.apache.poi.xwpf.converter.pdf', version: '1.0.6'
+    implementation 'org.jsoup:jsoup:1.10.3'
+//    implementation 'com.itextpdf:itextg:5.5.10'
+//    implementation group: 'com.itextpdf.tool', name: 'xmlworker', version: '5.5.9'
+//    implementation 'com.itextpdf:html2pdf:2.0.2'
 }
 
 //jar. {
@@ -95,3 +102,4 @@ dependencies {
 //
 //jar.dependsOn shadowJar
 //test.dependsOn shadowJar
+

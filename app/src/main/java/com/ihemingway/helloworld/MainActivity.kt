@@ -3,6 +3,7 @@ package com.ihemingway.helloworld
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import com.ihemingway.helloworld.filereader.FileReadListActivity
 import com.ihemingway.helloworld.filereader.FileReaderActivity
 import com.ihemingway.helloworld.filereader.ReadOfficeActivity
 import com.ihemingway.helloworld.shortcut.ShortCutActivity
@@ -23,7 +24,7 @@ class MainActivity : AppCompatActivity() {
 
     fun startActivity1(){
         var intent = Intent(Intent.ACTION_CREATE_SHORTCUT)
-        intent.setClass(this, ReadOfficeActivity::class.java)
+        intent.setClass(this, FileReadListActivity::class.java)
 //        intent.setAction()
         startActivityForResult(intent,100)
     }

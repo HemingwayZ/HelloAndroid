@@ -71,7 +71,7 @@ public class FileReaderActivity extends AppCompatActivity {
     }
 
     public void openUrl(){
-        String fileName = Environment.getExternalStorageDirectory().getPath() + "/testWord.docx";
+        String fileName = Environment.getExternalStorageDirectory().getPath() + "/test_word2.docx";
         File file = new File(fileName);
         if (!file.exists()) {
             Toast.makeText(this, "File is not exist!!!", Toast.LENGTH_SHORT).show();
@@ -81,8 +81,9 @@ public class FileReaderActivity extends AppCompatActivity {
         boolean isCanOpen = tbsReaderView.preOpen("docx", false);
         if (isCanOpen) {
             Bundle bundle = new Bundle();
-            bundle.putString("filePath", file.getPath());
-            bundle.putString("tempPath", Environment.getExternalStorageDirectory().getPath());
+            bundle.putString(TbsReaderView.KEY_FILE_PATH, file.getPath());
+            bundle.putString(TbsReaderView.KEY_TEMP_PATH, Environment.getExternalStorageDirectory().getPath());
+            bundle.putBoolean(TbsReaderView.IS_BAR_SHOWING,true);
             tbsReaderView.openFile(bundle);
         }
     }

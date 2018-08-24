@@ -80,7 +80,9 @@
             android:name=".LoginActivity"
             android:label="@string/title_activity_login" />
         <activity android:name=".filereader.FileReaderActivity" />
-        <activity android:name=".filereader.ReadOfficeActivity"></activity>
+        <activity android:name=".filereader.ReadOfficeActivity" />
+        <activity android:name=".filereader.FileReadListActivity" />
+        <activity android:name=".filereader.ReadOfficeLocalActivity"></activity>
     </application>
 
 </manifest>
