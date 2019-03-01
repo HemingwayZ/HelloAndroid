@@ -3,6 +3,7 @@ package com.ihemingway.helloworld.widget;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Path;
@@ -14,11 +15,14 @@ import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.AccelerateInterpolator;
+
+import com.ihemingway.helloworld.R;
 
 /**
  * ToggleView
@@ -33,6 +37,10 @@ public class MBToggleView extends View {
     private static final int STATE_SWITCH_ON2 = 3;
     private static final int STATE_SWITCH_OFF2 = 2;
     private static final int STATE_SWITCH_OFF = 1;
+
+    private static final float DEFAULT_TEXT_SIZE =10;
+    private static final float TEXT_SIZE_OFFSET = 0.4f;
+    private float textSize = DEFAULT_TEXT_SIZE;
 
     private final AccelerateInterpolator interpolator = new AccelerateInterpolator(2);
     private final Paint paint = new Paint();
@@ -85,6 +93,10 @@ public class MBToggleView extends View {
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     public MBToggleView(Context context, AttributeSet attrs) {
         super(context, attrs);
+        initView(context,attrs);
+    }
+
+    private void initView(Context context, AttributeSet attrs) {
         setLayerType(LAYER_TYPE_SOFTWARE, null);
 
         lastState = state;
@@ -105,6 +117,19 @@ public class MBToggleView extends View {
             }
         }
         setColor(DEFAULT_COLOR_PRIMARY);
+
+
+        TypedArray typedArray=context.obtainStyledAttributes(attrs, R.styleable.MBToggleView);
+       String text = typedArray.getString(R.styleable.MBToggleView_leftText);
+       if(!TextUtils.isEmpty(text)){
+           leftText = text;
+       }
+       text = typedArray.getString(R.styleable.MBToggleView_rightText);
+       if(!TextUtils.isEmpty(text)){
+           rightText = text;
+       }
+      textSize = typedArray.getFloat(R.styleable.MBToggleView_textSize,DEFAULT_TEXT_SIZE);
+        typedArray.recycle();
     }
 
     public void setColor(int newColorPrimary) {
@@ -327,7 +352,6 @@ public class MBToggleView extends View {
         }
         return result - bOffLeftX;
     }
-
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
@@ -370,14 +394,14 @@ public class MBToggleView extends View {
         paint.setTypeface(Typeface.DEFAULT_BOLD);
         paint.setColor(0xff303030);
         paint.setFakeBoldText(!isOn);
-        paint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP,isOn?10:10.5f,getContext().getResources().getDisplayMetrics()));
+        paint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP,isOn?textSize:textSize+TEXT_SIZE_OFFSET,getContext().getResources().getDisplayMetrics()));
 
 
         paint.getTextBounds(leftText,0,leftText.length(),mTextRect);
         float distance = (paint.getFontMetrics().bottom-paint.getFontMetrics().top)/2-paint.getFontMetrics().bottom;
         canvas.drawText(leftText,mWidth/4.0f-mTextRect.width()/2.0f,mHeight/2.0f+distance,paint);
         paint.setFakeBoldText(isOn);
-        paint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP,!isOn?10:10.5f,getContext().getResources().getDisplayMetrics()));
+        paint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP,!isOn?textSize:textSize+TEXT_SIZE_OFFSET,getContext().getResources().getDisplayMetrics()));
         paint.getTextBounds(rightText,0,rightText.length(),mTextRect);
         distance = (paint.getFontMetrics().bottom-paint.getFontMetrics().top)/2-paint.getFontMetrics().bottom;
         canvas.drawText(rightText,mWidth/4.0f*3-mTextRect.width()/2.0f,mHeight/2.0f+distance,paint);

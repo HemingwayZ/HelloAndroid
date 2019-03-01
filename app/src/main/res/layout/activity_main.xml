@@ -34,7 +34,9 @@
     <com.ihemingway.helloworld.widget.MBToggleView
         android:layout_width="86dp"
         android:layout_marginTop="20dp"
-
+        app:leftText="单张"
+        app:rightText="多张"
+        app:textSize="9"
         android:layout_gravity="center_horizontal"
         android:layout_height="wrap_content" />
 
