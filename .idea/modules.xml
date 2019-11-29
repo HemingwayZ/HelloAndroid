@@ -3,6 +3,11 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/HelloAndroid.iml" filepath="$PROJECT_DIR$/HelloAndroid.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/HelloAndroid-app.iml" filepath="$PROJECT_DIR$/app/HelloAndroid-app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/editpic/HelloAndroid-editpic.iml" filepath="$PROJECT_DIR$/editpic/HelloAndroid-editpic.iml" />
+      <module fileurl="file://$PROJECT_DIR$/libhellosponge/HelloAndroid-libhellosponge.iml" filepath="$PROJECT_DIR$/libhellosponge/HelloAndroid-libhellosponge.iml" />
+      <module fileurl="file://$PROJECT_DIR$/mbprintservice/HelloAndroid-mbprintservice.iml" filepath="$PROJECT_DIR$/mbprintservice/HelloAndroid-mbprintservice.iml" />
+      <module fileurl="file://$PROJECT_DIR$/StudioProjects-HelloAndroid.iml" filepath="$PROJECT_DIR$/StudioProjects-HelloAndroid.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/editpic/editpic.iml" filepath="$PROJECT_DIR$/editpic/editpic.iml" />
       <module fileurl="file://$PROJECT_DIR$/libhellosponge/libhellosponge.iml" filepath="$PROJECT_DIR$/libhellosponge/libhellosponge.iml" />

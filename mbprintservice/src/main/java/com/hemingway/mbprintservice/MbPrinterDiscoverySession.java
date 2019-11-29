@@ -166,44 +166,44 @@ public class MbPrinterDiscoverySession extends PrinterDiscoverySession {
                 }
             };
 
-    private ScanCallback callBack = new ScanCallback() {
-        @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-        @Override
-        public void onScanResult(int callbackType, ScanResult result) {
-            BluetoothDevice device = result.getDevice();
-            String deviceName = device.getName();
-            if (deviceName == null) {
-                deviceName = "";
-            }
-            Log.d(TAG,deviceName+" "+device.getAddress());
-            if (DeviceUtils.isLegalDevice(deviceName)) {
-                deviceName = deviceName+"\n"+device.getAddress();
-                PrinterInfo myprinter = new PrinterInfo
-                        .Builder(mbPrintService.generatePrinterId(device.getAddress()), deviceName, PrinterInfo.STATUS_IDLE)
-                        .build();
-                List<PrinterInfo> printers = MbPrinterDiscoverySession.this.getPrinters();
-                //关闭服务之后是异步操作
-                try {
-                    printers.add(myprinter);
-                    addPrinters(printers);
-                }catch (Exception e){
-                    e.printStackTrace();
-                }
-            }
-
-            super.onScanResult(callbackType, result);
-        }
-
-        @Override
-        public void onBatchScanResults(List<ScanResult> results) {
-            super.onBatchScanResults(results);
-        }
-
-        @Override
-        public void onScanFailed(int errorCode) {
-            super.onScanFailed(errorCode);
-        }
-    };
+//    private ScanCallback callBack = new ScanCallback() {
+//        @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+//        @Override
+//        public void onScanResult(int callbackType, ScanResult result) {
+//            BluetoothDevice device = result.getDevice();
+//            String deviceName = device.getName();
+//            if (deviceName == null) {
+//                deviceName = "";
+//            }
+//            Log.d(TAG,deviceName+" "+device.getAddress());
+//            if (DeviceUtils.isLegalDevice(deviceName)) {
+//                deviceName = deviceName+"\n"+device.getAddress();
+//                PrinterInfo myprinter = new PrinterInfo
+//                        .Builder(mbPrintService.generatePrinterId(device.getAddress()), deviceName, PrinterInfo.STATUS_IDLE)
+//                        .build();
+//                List<PrinterInfo> printers = MbPrinterDiscoverySession.this.getPrinters();
+//                //关闭服务之后是异步操作
+//                try {
+//                    printers.add(myprinter);
+//                    addPrinters(printers);
+//                }catch (Exception e){
+//                    e.printStackTrace();
+//                }
+//            }
+//
+//            super.onScanResult(callbackType, result);
+//        }
+//
+//        @Override
+//        public void onBatchScanResults(List<ScanResult> results) {
+//            super.onBatchScanResults(results);
+//        }
+//
+//        @Override
+//        public void onScanFailed(int errorCode) {
+//            super.onScanFailed(errorCode);
+//        }
+//    };
 
     @Override
     public void onStopPrinterDiscovery() {
